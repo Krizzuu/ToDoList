@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/task_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:text="Task Title"
+        android:textSize="24sp"
+        android:theme="@style/Theme.ToDoList"
+        />
+
+    <TextView
+        android:id="@+id/task_category"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/task_title"
+        android:layout_alignStart="@+id/task_title"
+        android:layout_marginTop="4dp"
+        android:text="Category"
+        android:textSize="16sp" />
+
+</RelativeLayout>

@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">ToDoList</string>
+    <string name="config_file">config</string>
+</resources>
