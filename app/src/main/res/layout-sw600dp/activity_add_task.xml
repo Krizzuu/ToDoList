@@ -12,28 +12,31 @@
         >
         <EditText
             android:id="@+id/task_title"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/guide_line"
             android:hint="Title"
             android:textSize="32sp"
             />
         <EditText
             android:id="@+id/task_category"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@+id/task_title"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/guide_line"
             android:hint="Category"
             android:textSize="24sp"
             />
         <EditText
             android:id="@+id/task_description"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@+id/task_category"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/guide_line"
             android:hint="Description"
             android:textSize="24sp"
             />
@@ -42,6 +45,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@+id/task_description"
+            android:gravity="center"
             >
             <DatePicker
                 android:id="@+id/task_deadline_date"
@@ -62,29 +66,38 @@
                 android:timePickerMode="spinner"
                 />
         </LinearLayout>
-        <CheckBox
-            android:id="@+id/task_notification"
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guide_line"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/deadline_picker"
-            app:layout_constraintStart_toStartOf="parent"
-            android:text="Enable notifications"
+            app:layout_constraintGuide_percent="0.65"
+            android:orientation="vertical"
             />
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/task_attachments"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/task_notification"
+            app:layout_constraintTop_toBottomOf="@+id/deadline_picker"
             />
+
+        <CheckBox
+            android:id="@+id/task_notification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="@id/guide_line"
+            android:text="Enable notifications"
+            />
+
         <Button
             android:id="@+id/add_attachment_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/save_task_button"
-            app:layout_constraintTop_toBottomOf="@+id/task_attachments"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@id/guide_line"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/task_notification"
             android:hint="Add image"
             android:textSize="24sp"
             />
@@ -93,14 +106,13 @@
             android:id="@+id/save_task_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toEndOf="@+id/add_attachment_button"
+            app:layout_constraintStart_toStartOf="@id/guide_line"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/task_attachments"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginLeft="6sp"
+            app:layout_constraintTop_toBottomOf="@+id/add_attachment_button"
             android:hint="Save"
             android:textSize="24sp"
             />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
