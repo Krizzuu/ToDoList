@@ -1,5 +1,6 @@
 package com.pam.todolist
 
+import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -12,6 +13,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.io.File
@@ -94,10 +96,20 @@ class TaskDetailsActivity : AppCompatActivity() {
         createTime.text = ("Created: " + task?.createTime) ?: "N/A"
         deadline.text = ("Deadline: " + task?.deadline) ?: "N/A"
 
-        val attachmentAdapter = AttachmentAdapter(ArrayList<Uri>(task!!.attachments), object: AttachmentAdapter.OnClickListener {
-            override fun onLongClick(uri: Uri, position: Int) {
+        val attachmentAdapter = AttachmentAdapter(this, ArrayList<Uri>(task!!.attachments), object: AttachmentAdapter.OnClickListener {
+            override fun onClick(attachmentUri: Uri) {
+                val file = File(attachmentUri.path ?: return)
+                val uri = FileProvider.getUriForFile(this@TaskDetailsActivity, "com.pam.todolist.provider", file)
 
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK
+                intent.setDataAndType(uri, contentResolver.getType(uri))
+
+                intent.clipData = ClipData.newRawUri(null, uri)
+
+                startActivity(intent)
             }
+            override fun onLongClick(uri: Uri, position: Int) {}
         })
 
         attachments.layoutManager = LinearLayoutManager(this)

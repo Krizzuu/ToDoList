@@ -26,6 +26,17 @@
         <receiver android:name=".NotificationReceiver" />
         <service android:name=".NotificationService" />
 
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.pam.todolist.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths"/>
+        </provider>
+
+
         <activity
             android:name=".AddTaskActivity"
             android:exported="false" />

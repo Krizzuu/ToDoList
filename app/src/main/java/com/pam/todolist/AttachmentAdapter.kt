@@ -1,17 +1,24 @@
 package com.pam.todolist
 
 import android.annotation.SuppressLint
-import android.graphics.drawable.BitmapDrawable
+import android.content.ClipData
+import android.content.Context
+import android.content.Intent
 import android.net.Uri
+import android.os.Environment
+import android.text.method.LinkMovementMethod
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat.startActivity
+import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.squareup.picasso.Picasso
+import java.io.File
 
 
 class AttachmentAdapter(
+    private val context: Context,
     private var attachments: List<Uri>,
     private val listener: OnClickListener
 ) : RecyclerView.Adapter<AttachmentViewHolder>() {
@@ -26,22 +33,24 @@ class AttachmentAdapter(
     }
 
     override fun onBindViewHolder(holder: AttachmentViewHolder, position: Int) {
-        val imageUri: Uri = attachments[position]
+        val attachmentUri: Uri = attachments[position]
 
-//        Glide.with(holder.itemView.context)
-//            .load(imageUri)
-//            .into(holder.attachmentImageView)
-        Picasso.get()
-            .load(imageUri)
-            .into(holder.attachmentImageView)
+        holder.attachmentView.text = attachmentUri.toString()
 
-        holder.itemView.setOnLongClickListener {
-            listener.onLongClick(imageUri, position)
+        holder.attachmentView.setOnLongClickListener {
+            Log.i("LongClick", "Long Click Triggered")
+            listener.onLongClick(attachmentUri, position)
             true
+        }
+
+        holder.attachmentView.setOnClickListener {
+            Log.i("LongClick", "Click Triggered")
+            listener.onClick(attachmentUri)
         }
     }
 
     interface OnClickListener {
+        fun onClick(attachmentUri: Uri)
         fun onLongClick(uri : Uri, position: Int)
     }
 

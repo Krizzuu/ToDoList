@@ -90,7 +90,7 @@
             app:layout_constraintStart_toStartOf="@id/guide_line"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/task_notification"
-            android:hint="Add image"
+            android:hint="Add file"
             android:textSize="24sp"
             />
 

@@ -2,6 +2,7 @@ package com.pam.todolist
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.ClipData
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -9,10 +10,12 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.util.Log
+import android.webkit.MimeTypeMap
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -42,15 +45,15 @@ open class AddTaskActivity : AppCompatActivity() {
 
     protected val getContentLauncher = registerForActivityResult<String, Uri>(ActivityResultContracts.GetContent()) { result ->
         if (result != null) {
-            val imagePath = copyImageToPrivateStorage(result);
+            val attachmentPath = copyFileToPrivateStorage(result);
             Log.i("ImageLoader", "Copied an image")
-            if (imagePath != null) {
-                attachments.add(imagePath)
-                Log.i("Loaded:", imagePath.toString())
+            if (attachmentPath != null) {
+                attachments.add(attachmentPath)
+                Log.i("Loaded:", attachmentPath.toString())
                 attachmentAdapter.updateAttachments(attachments)
             }
             else {
-                Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Failed to load file", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -79,7 +82,7 @@ open class AddTaskActivity : AppCompatActivity() {
 
         saveButton.setOnClickListener{ saveTask() }
         addAttachment.setOnClickListener{
-            getContentLauncher.launch("image/*");
+            getContentLauncher.launch("*/*")
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -94,9 +97,22 @@ open class AddTaskActivity : AppCompatActivity() {
             notificationManager.createNotificationChannel(channel)
         }
 
-        attachmentAdapter = AttachmentAdapter(ArrayList<Uri>(), object:
+        attachmentAdapter = AttachmentAdapter(this, ArrayList<Uri>(), object:
             AttachmentAdapter.OnClickListener {
+            override fun onClick(attachmentUri: Uri) {
+                val file = File(attachmentUri.path ?: return)
+                val uri = FileProvider.getUriForFile(this@AddTaskActivity, "com.pam.todolist.provider", file)
+
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK
+                intent.setDataAndType(uri, contentResolver.getType(uri))
+
+                intent.clipData = ClipData.newRawUri(null, uri)
+
+                startActivity(intent)
+            }
             override fun onLongClick(uri: Uri, position: Int) {
+                Log.i("LongClick", "Showing pup up")
                 val builder = AlertDialog.Builder(this@AddTaskActivity)
                 builder.setMessage("Do you want to delete this image?")
                     .setPositiveButton("Yes") { _, _ ->
@@ -178,6 +194,30 @@ open class AddTaskActivity : AppCompatActivity() {
             val inputStream: InputStream = contentResolver.openInputStream(sourceUri) ?: return null
             val fileName = "attachment_" + System.currentTimeMillis() + ".jpg"
             val directory: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+            val file = File(directory, fileName)
+            FileOutputStream(file).use { outputStream ->
+                val buffer = ByteArray(1024)
+                var length: Int
+                while (inputStream.read(buffer).also { length = it } > 0) {
+                    outputStream.write(buffer, 0, length)
+                }
+            }
+            inputStream.close()
+            Uri.fromFile(file)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    private fun copyFileToPrivateStorage(sourceUri: Uri): Uri? {
+        return try {
+            val inputStream: InputStream = contentResolver.openInputStream(sourceUri) ?: return null
+            val mimeType: String? = contentResolver.getType(sourceUri)
+            val extension: String = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: ""
+
+            val fileName = "attachment_" + System.currentTimeMillis() + "." + extension
+            val directory: File? = getExternalFilesDir(null)
             val file = File(directory, fileName)
             FileOutputStream(file).use { outputStream ->
                 val buffer = ByteArray(1024)
